@@ -1,6 +1,5 @@
 require "sinatra"
 require "mogli"
-require "memcachier"
 
 enable :sessions
 set :raise_errors, false
@@ -35,7 +34,7 @@ helpers do
   def friends
     @friends ||= settings.cache.fetch("#{session[:at]}:friends") do
       friends = client.fql_query("SELECT uid, name, current_location FROM user WHERE uid in (SELECT uid2 FROM friend WHERE uid1 = me())")
-      settings.cache.set("#{session[:at]}:friends", friends, :expires_in => 60)
+      settings.cache.set("#{session[:at]}:friends", friends, 60)
       friends
     end
   end
@@ -54,7 +53,7 @@ get "/" do
 
   @user = settings.cache.fetch("#{session[:at]}:me") do
     user = Mogli::User.find("me", @client)
-    settings.cache.set("#{session[:at]}:me", user, :expires_in => 60)
+    settings.cache.set("#{session[:at]}:me", user, 60)
     user
   end
   
