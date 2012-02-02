@@ -34,7 +34,7 @@ helpers do
   def friends
     @friends ||= settings.cache.fetch("#{session[:at]}:friends") do
       friends = client.fql_query("SELECT uid, name, current_location FROM user WHERE uid in (SELECT uid2 FROM friend WHERE uid1 = me())")
-      settings.cache.set("#{session[:at]}:friends", friends, 60)
+      settings.cache.set("#{session[:at]}:friends", friends, 600)
       friends
     end
   end
@@ -53,7 +53,7 @@ get "/" do
 
   @user = settings.cache.fetch("#{session[:at]}:me") do
     user = Mogli::User.find("me", @client)
-    settings.cache.set("#{session[:at]}:me", user, 60)
+    settings.cache.set("#{session[:at]}:me", user, 600)
     user
   end
   
@@ -66,15 +66,24 @@ get "/search" do
   
   content_type :json
   query = params[:term].downcase
+  cities = friends.map do |friend|
+    friend["current_location"] and friend["current_location"]["city"]
+  end
+  cities.uniq!
+  
+  result = cities.select do |city|
+    city and city.downcase.index(query)
+  end
+  result.to_json
+end
+
+get "/friends_in" do
   result = friends.select do |friend|
     if friend["current_location"]
-      friend["name"].downcase.index(query)
+      friend["current_location"]["city"] == params[:city]
     else
       nil
     end
-  end
-  result = result.map do |friend|
-      {:label => friend["name"], :value => friend["current_location"]["name"] }
   end
   result.to_json
 end

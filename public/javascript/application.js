@@ -1,12 +1,16 @@
 $(function() {
   $("#friend_name").autocomplete({
     source: "/search",
-		select: function( event, ui ) {
-						if (ui.item) {
-							window.location.href = "mailto:" + ui.item.value;
-						}
+		minLength: 2,
+		select: function(event, ui) {
+						$.getJSON("/friends_in?city=" + ui.item.label, function(data) {
+							$("#friends_list").html("");
+							$.each(data, function(i, friend) {
+								$("#friends_list").append("<li>" + friend.name + "</li>");
+							});
+						});
+						$("#friend_name").val("");
+						return false;
 					}
-  }).data("autocomplete")._renderItem = function(ul, item) {
-    return $("<li></li>").append("<a>" + item.label + " (" + item.value + ")</a>").appendTo(ul);
-  };
+  })
 });
