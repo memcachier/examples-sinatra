@@ -3,11 +3,13 @@ GEM
   specs:
     crack (0.1.8)
     daemons (1.1.3)
+    dalli (1.1.3)
     eventmachine (0.12.10)
     hashie (1.1.0)
     httparty (0.7.8)
       crack (= 0.1.8)
     json (1.5.4)
+    memcachier (0.0.1)
     mogli (0.0.32)
       hashie (~> 1.1.0)
       httparty (>= 0.4.3)
@@ -27,8 +29,10 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  dalli
   httparty
   json
+  memcachier
   mogli
   sinatra
   thin
