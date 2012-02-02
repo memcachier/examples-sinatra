@@ -1,5 +1,6 @@
 require "sinatra"
 require "mogli"
+require "memcachier"
 
 enable :sessions
 set :raise_errors, false
