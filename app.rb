@@ -4,7 +4,18 @@ require "mogli"
 enable :sessions
 set :raise_errors, false
 set :show_exceptions, false
+
+# MemCachier Setup
+# ===============
 set :cache, Dalli::Client.new
+
+# May need to pass in the MEMCACHIER_SERVERS, MEMCACHIER_USERNAME,
+# MEMCACHIER_PASSWORD if _not_ using the memcachier gem, as above depends on
+# the environment varialbes being set and passed in by the gem. Alternative is:
+# set :cache, Dalli::Client.new(ENV["MEMCACHIER_SERVERS"],
+#                   {:username => ENV["MEMCACHIER_USERNAME"],
+#                    :password => ENV["MEMCACHIER_PASSWORD"]}
+
 
 unless ENV["FACEBOOK_APP_ID"] && ENV["FACEBOOK_SECRET"]
   abort("missing env vars: please set FACEBOOK_APP_ID and FACEBOOK_SECRET with your app credentials")
