@@ -34,7 +34,7 @@ set :cache, Dalli::Client.new
 # Define facebook permissions needed.
 # See https://developers.facebook.com/docs/reference/api/permissions/
 # for a full list of permissions
-FACEBOOK_SCOPE = 'user_likes,user_photos,user_location,friends_location'
+FACEBOOK_SCOPE = 'user_location,friends_location'
 
 unless ENV["FACEBOOK_APP_ID"] && ENV["FACEBOOK_SECRET"]
   abort("missing env vars: please set FACEBOOK_APP_ID and FACEBOOK_SECRET with your app credentials")
