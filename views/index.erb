@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:fb="http://ogp.me/ns/fb#" lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Sinatra caching example</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= @app['name'] %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes" />
   <meta name="description" content="MemCachier Sinatra Example">
   <meta name="author" content="MemCachier">
+  <link rel="shortcut icon" href="/images/favicon.ico">
 
   <link rel="stylesheet" href="/stylesheets/bootstrap.min.css" media="screen">
   <link rel="stylesheet" href="/stylesheets/bootstrap-responsive.min.css" media="screen">
@@ -17,19 +18,77 @@
   <!-- over facebook.  You should fill these tags in with      -->
   <!-- your data.  To learn more about Open Graph, visit       -->
   <!-- 'https://developers.facebook.com/docs/opengraph/'       -->
-  <meta property="og:title" content=""/>
-  <meta property="og:type" content=""/>
-  <meta property="og:url" content=""/>
-  <meta property="og:image" content=""/>
-  <meta property="og:site_name" content=""/>
+  <meta property="og:title" content="<%= @app['name'] %>" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="<%= url %>" />
+  <meta property="og:image" content="<%= url('/logo.png') %>" />
+  <meta property="og:site_name" content="<%= @app['name'] %>" />
+  <meta property="og:description" content="My First App" />
+  <meta property="fb:app_id" content="<%= @app['name'] %>" />
 
-  <script src="/javascript/bootstrap.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/javascript/jquery.min.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/javascript/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/javascript/application.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/javascripts/bootstrap.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/javascripts/jquery-1.7.2.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/javascripts/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/javascripts/application.js" type="text/javascript" charset="utf-8"></script>
+
+  <script type="text/javascript">
+    function logResponse(response) {
+      if (console && console.log) {
+        console.log('The response was', response);
+      }
+    }
+
+    $(function(){
+      // Set up so we handle click on the buttons
+      $('#postToWall').click(function() {
+        FB.ui(
+          {
+            method : 'feed',
+            link   : $(this).attr('data-url')
+          },
+          function (response) {
+            // If response is null the user canceled the dialog
+            if (response != null) {
+              logResponse(response);
+            }
+          }
+        );
+      });
+
+      $('#sendToFriends').click(function() {
+        FB.ui(
+          {
+            method : 'send',
+            link   : $(this).attr('data-url')
+          },
+          function (response) {
+            // If response is null the user canceled the dialog
+            if (response != null) {
+              logResponse(response);
+            }
+          }
+        );
+      });
+
+      $('#sendRequest').click(function() {
+        FB.ui(
+          {
+            method  : 'apprequests',
+            message : $(this).attr('data-message')
+          },
+          function (response) {
+            // If response is null the user canceled the dialog
+            if (response != null) {
+              logResponse(response);
+            }
+          }
+        );
+      });
+    });
+  </script>
 
   <!--[if IE]>
-    <script>
+    <script type="text/javascript">
       var tags = ['header', 'section'];
       while(tags.length)
         document.createElement(tags.pop());
@@ -37,31 +96,89 @@
   <![endif]-->
 
   <!--[if lt IE 9]>
-  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <script src="/javascripts/html5.js"></script>
   <![endif]-->
-
-  <link rel="shortcut icon" href="/images/favicon.ico">
 </head>
-<body>
 
-  <!-- Part 1: Wrap all page content here -->
+<body>
+  <!-- Facebook login handle -->
+  <div id="fb-root"></div>
+  <script type="text/javascript">
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : "<%= @app['id'] %>",                     // App ID
+        channelUrl : "<%= url_no_scheme('/channel.html') %>", // Channel File
+        status     : true,                                    // check login status
+        cookie     : true,                                    // enable cookies to allow the server to access the session
+        xfbml      : true                                     // parse XFBML
+      });
+
+      // Listen to the auth.login which will be called when the user logs in
+      // using the Login button
+      FB.Event.subscribe('auth.login', function(response) {
+        // We want to reload the page now so Ruby can read the cookie that the
+        // Javascript SDK sat. But we don't want to use
+        // window.location.reload() because if this is in a canvas there was a
+        // post made to this page and a reload will trigger a message to the
+        // user asking if they want to send data again.
+        window.location = window.location;
+      });
+
+      FB.Canvas.setAutoGrow();
+    };
+
+    // Load the SDK Asynchronously
+    (function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/all.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+  </script>
+
+  <!-- Page Content -->
   <div id="wrap">
     <div class="container">
+
       <header class="page-header">
-        <p id="picture" style="background-image: url(https://graph.facebook.com/me/picture?type=normal&access_token=<%= @client.access_token %>)"></p>
-        <h1>Welcome, <strong><%= @user.name %></strong></h1>
+        <h1>Sinatra &amp; Facebook caching example</h1>
       </header>
-      <section id="search">
-        <h2>Search for a city:</h2>
-        <input type="search" id="friend_name"/>
-      </section>
-      <section>
-        <ul id="friends_list">
-        </ul>
-      </section>
+
+      <% if @user %>
+        <p id="picture" style="background-image: url(https://graph.facebook.com/<%= @user['id'] %>/picture?type=normal)"></p>
+        <p class="lead">Welcome, <strong><%= @user['name'] %></strong></p>
+      <% else %>
+        <p class="lead">Welcome</p>
+        <div class="fb-login-button" data-scope="<%= FACEBOOK_SCOPE %>">Log In</div>
+      <% end %>
+
+      <p class="lead">This exampe app demonstrates the use of Memcached to
+        create a cache queries to the
+        <a href="https://developers.facebook.com/">Facebook Graph API</a>. This
+        application loads your list of friends, caches them, and provides a
+        searchable interface by city of residence.</p>
+
+      <% if @user %>
+        <section id="search">
+          <p class="lead">Search a city to see which friends live there. The
+            search box will autocomplete the city based on all possible cities
+            you have friends in.</p>
+          <div class="container" style="width:400px;">
+            <input type="search" id="friend_name"/>
+          </div>
+        </section>
+        <section class="container" style="width:400px;">
+          <ul id="friends_list">
+          </ul>
+        </section>
+      <% end %>
+
+      <div id="push"></div>
     </div>
   </div>
 
+  <!-- MemCachier Footer -->
   <div id="footer">
     <div class="container">
       <p class="muted credit">Example by

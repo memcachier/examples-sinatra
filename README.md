@@ -56,6 +56,9 @@ set :cache, Dalli::Client.new
 ## Deploying example
 
 Below are steps for getting the example running in its current state.
+If you run into any problems you can follow the more extensive [Heroku
+guide](https://devcenter.heroku.com/articles/facebook) for running
+Facebook web apps locally and on Heroku.
 
 ### Run locally
 
@@ -65,8 +68,9 @@ Below are steps for getting the example running in its current state.
    $ bundle install
    ~~~~
 
-2. [Create an app on Facebook](https://developers.facebook.com/apps)
-   and set the Website URL to `http://localhost:5000/`.
+2. [Create an app on Facebook](https://developers.facebook.com/apps).
+   Select 'Website' for how the app will interact with Facebook and
+   set the 'Site URL' to be 'http://127.0.0.1:5000/'.
 
 3. Copy the App ID and Secret from the Facebook app settings page into
    your `.env`:
@@ -76,8 +80,7 @@ Below are steps for getting the example running in its current state.
    echo FACEBOOK_SECRET=abcde >> .env
    ~~~~
 
-4. Launch the app with
-   [Foreman](http://blog.daviddollar.org/2011/05/06/introducing-foreman.html):
+4. Launch the app with Foreman.
 
    ~~~~ .sh
    foreman start
@@ -85,24 +88,25 @@ Below are steps for getting the example running in its current state.
 
 ### Deploy to Heroku via Facebook integration
 
-The easiest way to deploy is to create an app on Facebook and click
-Cloud Services -> Get Started, then choose Ruby from the dropdown.
-You can then `git clone` the resulting app from Heroku.
+The easiest way to deploy a completely new app to Facebook using
+Heroku is to follow the [Heroku
+guide](https://devcenter.heroku.com/articles/facebook).
 
-### Deploy to Heroku directly
+To deploy this app to Facebook:
 
-If you prefer to deploy yourself, push this code to a new Heroku app
-on the Cedar stack, then copy the App ID and Secret into your config
-vars:
+1. Create a new Facebook application (different from the one used for
+   local development). On the 'Create New App' dialog box at the
+   start, select the option for 'Web Hosting' with Heorku. For the
+   application type, select Ruby.
 
-~~~~ .sh
-$ heroku create --stack cedar
-$ git push heroku master
-$ heroku config:add FACEBOOK_APP_ID=12345 FACEBOOK_SECRET=abcde
-~~~~
+2. This will create a new Heroku application that is setup with
+   Facebook correctly. Clone this new application from Heroku to you
+   local machine.
 
-Enter the URL for your Heroku app into the Website URL section of the
-Facebook app settings page, then you can visit your app on the web.
+3. Replace the existing template application that Heroku provides with
+   the code from this repository.
+
+4. Commit the change and deploy to Heroku.
 
 ## Get involved!
 
