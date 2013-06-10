@@ -53,6 +53,26 @@ web app at the start.
 set :cache, Dalli::Client.new
 ~~~~
 
+## Using MemCachier
+
+We can use MemCachier to cache the list of friends a user has.
+Normally we have to query Facebook for this information which is slow.
+
+    ~~~~ .ruby
+    # Retrieve friends list from MemCachier if possible.
+    def get_friends
+      # cache using session id as the key. May want to use a more permanent key
+      # that is meaningful across sessions.
+      @friends ||= settings.cache.fetch("#{session[:at]}:friends") do
+        # CACHE MISS -- so hit fb graph api and then store result in cache.
+        @graph = Koala::Facebook::API.new(access_token)
+        friends = @graph.fql_query("SELECT uid, name, current_location FROM user WHERE uid in (SELECT uid2 FROM friend WHERE uid1 = me())")
+        settings.cache.set("#{session[:at]}:friends", friends, 600) # cache for 10 minutes
+        friends
+      end
+    end
+    ~~~~
+
 ## Deploying example
 
 Below are steps for getting the example running in its current state.
