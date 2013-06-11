@@ -10,16 +10,21 @@
 #
 require "sinatra"
 require 'koala'
-require 'dalli'
 require 'memcachier'
 
 enable :sessions
+set :session_secret, ENV['SESSION_KEY'] || 'a super secret session key'
 set :raise_errors, false
 set :show_exceptions, false
 
 # ============================================================================
 # MemCachier Setup
 # ================
+# We simply use the Sinatra settings facility to store a Dalli memcache client
+# in a custom setting, cache, for easy global access across requests. We
+# _don't_ want to be creating memcache connections each request as that kills
+# performance. This method deals with that issue.
+# http://www.sinatrarb.com/configuration.html
 set :cache, Dalli::Client.new
 
 ## May need to pass in the MEMCACHIER_SERVERS, MEMCACHIER_USERNAME,
@@ -35,10 +40,24 @@ set :cache, Dalli::Client.new
 # See https://developers.facebook.com/docs/reference/api/permissions/
 # for a full list of permissions
 FACEBOOK_SCOPE = 'user_location,friends_location'
+# FACEBOOK_SCOPE = 'user_likes,user_photos'
 
 unless ENV["FACEBOOK_APP_ID"] && ENV["FACEBOOK_SECRET"]
   abort("missing env vars: please set FACEBOOK_APP_ID and FACEBOOK_SECRET with your app credentials")
 end
+
+# ============================================================================
+# MemCachier
+# ==========
+# We flush our cache on application launch to remove any stale data. In a lot
+# of setups you won't want to do this and instead should handle invalidations
+# another way.
+#
+# We do it here as caching the `@app` information from FB can cause issues if
+# it gets stale (e.g., you change what permissions your app needs).
+settings.cache.flush
+# settings.delete "myapp"
+# ============================================================================
 
 before do
   # HTTPS redirect
@@ -70,7 +89,8 @@ helpers do
 
   # allow for javascript authentication
   def access_token_from_cookie
-    authenticator.get_user_info_from_cookies(request.cookies)['access_token']
+    cookie = authenticator.get_user_info_from_cookies(request.cookies)
+    return cookie['access_token'] if cookie
   rescue => err
     warn err.message
   end
@@ -100,8 +120,9 @@ helpers do
   def get_app
     @app ||= settings.cache.fetch("myapp") do
       # CACHE MISS -- so hit fb graph api and then store result in cache.
-      @app = @graph.get_object(ENV["FACEBOOK_APP_ID"])
+      app = @graph.get_object(ENV["FACEBOOK_APP_ID"])
       settings.cache.set("myapp", @app, 60 * 60) # cache for 1 hour
+      app
     end
   end
 
@@ -119,8 +140,11 @@ get "/" do
   # TODO: ^ Would want to keep a permanent connection to FB, not open a new one
   # each page load.
 
-  # Get public details of current application
+  # # Get public details of current application
   get_app
+
+  # Get public details of current application
+  # @app = @graph.get_object(ENV["FACEBOOK_APP_ID"])
 
   if access_token
     @user = @graph.get_object("me")
