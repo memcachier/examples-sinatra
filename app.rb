@@ -89,8 +89,9 @@ helpers do
 
   # allow for javascript authentication
   def access_token_from_cookie
-    cookie = authenticator.get_user_info_from_cookies(request.cookies)
-    return cookie['access_token'] if cookie
+    @token ||= Koala::Facebook::OAuth.new(ENV["FACEBOOK_APP_ID"], ENV["FACEBOOK_SECRET"]).get_user_info_from_cookies(request.cookies)['access_token']
+    session[:access_token] = @token
+    @token
   rescue => err
     warn err.message
   end
@@ -120,7 +121,7 @@ helpers do
   def get_app
     @app ||= settings.cache.fetch("myapp") do
       # CACHE MISS -- so hit fb graph api and then store result in cache.
-      app = @graph.get_object(ENV["FACEBOOK_APP_ID"])
+      app = @graph.get_object("app")
       settings.cache.set("myapp", @app, 60 * 60) # cache for 1 hour
       app
     end
@@ -140,11 +141,9 @@ get "/" do
   # TODO: ^ Would want to keep a permanent connection to FB, not open a new one
   # each page load.
 
-  # # Get public details of current application
-  get_app
-
   # Get public details of current application
-  # @app = @graph.get_object(ENV["FACEBOOK_APP_ID"])
+  # @app = @graph.get_object("app")
+  get_app
 
   if access_token
     @user = @graph.get_object("me")
@@ -218,7 +217,6 @@ get "/preview/logged_out" do
   request.cookies.keys.each { |key, value| response.set_cookie(key, '') }
   redirect '/'
 end
-
 
 get "/auth/facebook" do
   session[:access_token] = nil
