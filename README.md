@@ -5,6 +5,8 @@ This is an example Ruby app that uses
 Facebook Graph API. This example is written using the Sinatra web
 framework. It's currently running at
 [memcachier-examples-sinatra.herokuapp.com](https://memcachier-examples-sinatra.herokuapp.com/)
+on Heroku using [MemCachier on
+Heroku](https://addons.heroku.com/memcachier).
 
 ## Setup MemCachier
 
@@ -26,8 +28,8 @@ gem 'dalli'
 Then run `bundle install` as usual.
 
 Note that the `memcachier` gem simply sets the appropriate environment
-variables for Dalli. You can also do this manually in your
-production.rb file if you prefer:
+variables for Dalli. You can also do this manually in your app.rb file
+if you prefer, before initializing Dalli:
 
 ~~~~ .ruby
 ENV["MEMCACHE_SERVERS"] = ENV["MEMCACHIER_SERVERS"]
@@ -35,13 +37,13 @@ ENV["MEMCACHE_USERNAME"] = ENV["MEMCACHIER_USERNAME"]
 ENV["MEMCACHE_PASSWORD"] = ENV["MEMCACHIER_PASSWORD"]
 ~~~~
 
-Alternatively, you can pass these options to config.cache_store (also
-in production.rb):
+Alternatively, you can pass these options to `set :cache` (also in
+app.rb):
 
 ~~~~ .ruby
-config.cache_store = :dalli_store, ENV["MEMCACHIER_SERVERS"],
-                    {:username => ENV["MEMCACHIER_USERNAME"],
-                     :password => ENV["MEMCACHIER_PASSWORD"]}
+set :cache, Dalli::Client.new(ENV["MEMCACHIER_SERVERS"],
+                  {:username => ENV["MEMCACHIER_USERNAME"],
+                   :password => ENV["MEMCACHIER_PASSWORD"]}
 ~~~~
 
 ### Sinatra setup
