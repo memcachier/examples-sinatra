@@ -1,5 +1,5 @@
 {
-  "name": "MemCachier Ruby & Facebook Example App",
+  "name": "MemCachier Sinatra App",
   "description": "Ruby Sinatra app illustrating how to use MemCachier to cache Facebook API data",
   "repository": "https://github.com/memcachier/examples-sinatra",
   "logo": "https://www.memcachier.com/assets/logo-large.png",
