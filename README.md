@@ -1,4 +1,4 @@
-# MemCachier Ruby & Facebook Example
+# MemCachier Ruby & Facebook Example App
 
 This is an example Ruby app that uses
 [MemCachier](http://www.memcachier.com) to cache data from the
@@ -7,6 +7,12 @@ framework. It's currently running at
 [memcachier-examples-sinatra.herokuapp.com](https://memcachier-examples-sinatra.herokuapp.com/)
 on Heroku using [MemCachier on
 Heroku](https://addons.heroku.com/memcachier).
+
+## Deploy to Heroku
+
+You can deploy this app yourself to Heroku to play with.
+
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
 ## Setup MemCachier
 
