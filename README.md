@@ -3,10 +3,9 @@
 This is an example Ruby app that uses
 [MemCachier](http://www.memcachier.com) to cache data from the
 Facebook Graph API. This example is written using the Sinatra web
-framework. It's currently running at
-[memcachier-examples-sinatra.herokuapp.com](https://memcachier-examples-sinatra.herokuapp.com/)
-on Heroku using [MemCachier on
-Heroku](https://addons.heroku.com/memcachier).
+framework. It's currently running
+[here](https://memcachier-examples-sinatra.herokuapp.com/) on Heroku using
+[MemCachier on Heroku](https://addons.heroku.com/memcachier).
 
 ## Deploy to Heroku
 
