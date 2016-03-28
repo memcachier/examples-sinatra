@@ -1,8 +1,10 @@
 {
   "name": "MemCachier Sinatra App",
   "description": "Ruby Sinatra app illustrating how to use MemCachier to cache Facebook API data",
-  "repository": "https://github.com/memcachier/examples-sinatra",
+  "keywords": ["ruby", "sinatra", "facebook", "memcache", "memcachier", "caching"],
   "logo": "https://www.memcachier.com/assets/logo-large.png",
-  "keywords": ["ruby", "sinatra", "facebook", "memcache", "memcachier", "caching" ],
+  "image": "heroku/python",
+  "website": "https://www.memcachier.com",
+  "repository": "https://github.com/memcachier/examples-sinatra",
   "addons": [ "memcachier" ]
 }
