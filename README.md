@@ -25,10 +25,10 @@ MemCachier has been tested with the [dalli memcache
 client](https://github.com/mperham/dalli). Add the following Gem to
 your Gemfile:
 
-~~~~ .ruby
+```ruby
 gem 'memcachier'
 gem 'dalli'
-~~~~
+```
 
 Then run `bundle install` as usual.
 
@@ -36,49 +36,49 @@ Note that the `memcachier` gem simply sets the appropriate environment
 variables for Dalli. You can also do this manually in your app.rb file
 if you prefer, before initializing Dalli:
 
-~~~~ .ruby
+```ruby
 ENV["MEMCACHE_SERVERS"] = ENV["MEMCACHIER_SERVERS"]
 ENV["MEMCACHE_USERNAME"] = ENV["MEMCACHIER_USERNAME"]
 ENV["MEMCACHE_PASSWORD"] = ENV["MEMCACHIER_PASSWORD"]
-~~~~
+```
 
 Alternatively, you can pass these options to `set :cache` (also in
 app.rb):
 
-~~~~ .ruby
+```ruby
 set :cache, Dalli::Client.new(ENV["MEMCACHIER_SERVERS"],
                   {:username => ENV["MEMCACHIER_USERNAME"],
                    :password => ENV["MEMCACHIER_PASSWORD"]}
-~~~~
+```
 
 ### Sinatra setup
 
 Ensure that the following configuration option is set in your Sinatra
 web app at the start.
 
-~~~~ .ruby
+```ruby
 set :cache, Dalli::Client.new
-~~~~
+```
 
 ## Using MemCachier
 
 We can use MemCachier to cache the list of friends a user has.
 Normally we have to query Facebook for this information which is slow.
 
-    ~~~~ .ruby
-    # Retrieve friends list from MemCachier if possible.
-    def get_friends
-      # cache using session id as the key. May want to use a more permanent key
-      # that is meaningful across sessions.
-      @friends ||= settings.cache.fetch("#{session[:at]}:friends") do
-        # CACHE MISS -- so hit fb graph api and then store result in cache.
-        @graph = Koala::Facebook::API.new(access_token)
-        friends = @graph.fql_query("SELECT uid, name, current_location FROM user WHERE uid in (SELECT uid2 FROM friend WHERE uid1 = me())")
-        settings.cache.set("#{session[:at]}:friends", friends, 600) # cache for 10 minutes
-        friends
-      end
-    end
-    ~~~~
+```ruby
+# Retrieve friends list from MemCachier if possible.
+def get_friends
+  # cache using session id as the key. May want to use a more permanent key
+  # that is meaningful across sessions.
+  @friends ||= settings.cache.fetch("#{session[:at]}:friends") do
+    # CACHE MISS -- so hit fb graph api and then store result in cache.
+    @graph = Koala::Facebook::API.new(access_token)
+    friends = @graph.fql_query("SELECT uid, name, current_location FROM user WHERE uid in (SELECT uid2 FROM friend WHERE uid1 = me())")
+    settings.cache.set("#{session[:at]}:friends", friends, 600) # cache for 10 minutes
+    friends
+  end
+end
+```
 
 ## Deploying example
 
@@ -91,9 +91,9 @@ Facebook web apps locally and on Heroku.
 
 1. Install dependencies:
 
-   ~~~~ .sh
+   ```sh
    $ bundle install
-   ~~~~
+   ```
 
 2. [Create an app on Facebook](https://developers.facebook.com/apps).
    Select 'Website' for how the app will interact with Facebook and
@@ -102,16 +102,16 @@ Facebook web apps locally and on Heroku.
 3. Copy the App ID and Secret from the Facebook app settings page into
    your `.env`:
 
-   ~~~~ .sh
+   ```sh
    echo FACEBOOK_APP_ID=12345 >> .env
    echo FACEBOOK_SECRET=abcde >> .env
-   ~~~~
+   ```
 
 4. Launch the app with Foreman.
 
-   ~~~~ .sh
+   ```sh
    foreman start
-   ~~~~
+   ```
 
 ### Deploy to Heroku via Facebook integration
 
